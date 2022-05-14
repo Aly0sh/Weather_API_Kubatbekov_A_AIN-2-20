@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -115,37 +116,43 @@ public class MainActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Call<GetWeatherModel> call = myGetter.getWeather(city.getText().toString());
-                call.enqueue(new Callback<GetWeatherModel>() {
-                    @Override
-                    public void onResponse(Call<GetWeatherModel> call, Response<GetWeatherModel> response) {
-                        cityNameTextView.setText(response.body().getLocation().getCityName());
-                        localtime.setText(response.body().getLocation().getLocaltime().toString());
-                        condition.setText(response.body().getCurrent().getCondition().getCondition());
-                        temp_c.setText(response.body().getCurrent().getTemp_c() + "°C");
-                        max_min_temp.setText(response.body().getForecast().getForecastdays().get(0).getDay().getMaxtemp() + "°C↑ \n" + response.body().getForecast().getForecastdays().get(0).getDay().getMintemp() + "°C↓ ");
-                        humidity.setText(response.body().getCurrent().getHumidity() + "%");
-                        pressure.setText(response.body().getCurrent().getPressure() + "\nmBar");
-                        wind.setText(response.body().getCurrent().getWind() + " km/h");
-                        sunrise.setText(response.body().getForecast().getForecastdays().get(0).getAstro().getSunrise());
-                        sunset.setText(response.body().getForecast().getForecastdays().get(0).getAstro().getSunset());
-                        cloud.setText(response.body().getCurrent().getCloud() + "%");
-                        if(response.body().getCurrent().isDay() == 0) {
-                            noon.setVisibility(View.GONE);
-                            night.setVisibility(View.VISIBLE);
-                        } else {
-                            noon.setVisibility(View.VISIBLE);
-                            night.setVisibility(View.GONE);
+                if(!city.getText().toString().isEmpty()) {
+                    Call<GetWeatherModel> call = myGetter.getWeather(city.getText().toString());
+                    call.enqueue(new Callback<GetWeatherModel>() {
+                        @Override
+                        public void onResponse(Call<GetWeatherModel> call, Response<GetWeatherModel> response) {
+                            cityNameTextView.setText(response.body().getLocation().getCityName());
+                            localtime.setText(response.body().getLocation().getLocaltime().toString());
+                            condition.setText(response.body().getCurrent().getCondition().getCondition());
+                            temp_c.setText(response.body().getCurrent().getTemp_c() + "°C");
+                            max_min_temp.setText(response.body().getForecast().getForecastdays().get(0).getDay().getMaxtemp() + "°C↑ \n" + response.body().getForecast().getForecastdays().get(0).getDay().getMintemp() + "°C↓ ");
+                            humidity.setText(response.body().getCurrent().getHumidity() + "%");
+                            pressure.setText(response.body().getCurrent().getPressure() + "\nmBar");
+                            wind.setText(response.body().getCurrent().getWind() + " km/h");
+                            sunrise.setText(response.body().getForecast().getForecastdays().get(0).getAstro().getSunrise());
+                            sunset.setText(response.body().getForecast().getForecastdays().get(0).getAstro().getSunset());
+                            cloud.setText(response.body().getCurrent().getCloud() + "%");
+                            if (response.body().getCurrent().isDay() == 0) {
+                                noon.setVisibility(View.GONE);
+                                night.setVisibility(View.VISIBLE);
+                            } else {
+                                noon.setVisibility(View.VISIBLE);
+                                night.setVisibility(View.GONE);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<GetWeatherModel> call, Throwable t) {
-                        System.out.println(t.getMessage());
-                    }
+                        @Override
+                        public void onFailure(Call<GetWeatherModel> call, Throwable t) {
+                            System.out.println(t.getMessage());
+                        }
 
-                });
-                slide.setVisibility(View.GONE);
+                    });
+                    slide.setVisibility(View.GONE);
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            "Заполните поле!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
         });
     }
